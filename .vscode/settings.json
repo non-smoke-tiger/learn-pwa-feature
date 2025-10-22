@@ -1,0 +1,34 @@
+{
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.guides.bracketPairs": true,
+  "editor.linkedEditing": true,
+  "editor.wordWrap": "on",
+  // "editor.codeActionsOnSave": [
+  //   "source.organizeImports",
+  //   "source.fixAll.eslint"
+  // ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": ["javascript", "typescript", "typescriptreact"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+  // มีกำหนดไว้ใน .prettierrc แล้ว ถ้าไม่มีไฟล์นี้ให้เพิ่มส่วนนี้เพื่อกำหนดค่า Prettier โดยตรง
+  // "prettier.semi": true,
+  // "prettier.singleQuote": true,
+  // "prettier.trailingComma": "es5",
+  // "prettier.tabWidth": 2
+}
