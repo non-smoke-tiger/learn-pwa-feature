@@ -61,6 +61,7 @@ function NotificationManager() {
           enqueueSnackbar(
             `${payload.title}${payload.body ? `: ${payload.body}` : ``}`,
             {
+              variant: 'warning',
               // กำหนดระยะเวลาซ่อนอัตโนมัติ (5 วินาที)
               autoHideDuration: 5000,
               // เพิ่ม Action/Button สำหรับนำทาง

@@ -18,6 +18,7 @@ import { useAppTheme } from '../AppThemeContext';
 import reactLogo from '../assets/react.svg';
 import muiLogo from '../assets/mui.svg';
 import viteLogo from '../assets/vite.svg';
+import SubscribeNotiButton from './SubscribeNotiButton';
 
 function TemplateContent() {
   // ดึง state และ helper functions จาก Context
@@ -208,6 +209,9 @@ function TemplateContent() {
             />
           }
         />
+      </Box>
+      <Box sx={{ my: 2 }}>
+        <SubscribeNotiButton />
       </Box>
     </Box>
   );
