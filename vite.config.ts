@@ -26,7 +26,49 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
         // สามารถเพิ่ม runtime caching สำหรับ API calls หรือรูปภาพภายนอกได้ที่นี่
         runtimeCaching: [
-          // แคช Google Fonts (ใช้ CacheFirst เพราะไม่ค่อยเปลี่ยน)
+          // การแคช App Shell (Cache First)
+          {
+            urlPattern: /.+\.(js|css|html|ico|png|svg|json|woff2|ttf)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'app-shell-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 วัน
+              },
+            },
+          },
+          // การแคชข้อมูล API (Stale While Revalidate)
+          {
+            urlPattern: ({ url }) =>
+              url.origin === self.location.origin && // ตรวจสอบว่า Origin ตรงกัน (ป้องกันแคช API ภายนอก)
+              url.pathname.startsWith('/api/'),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'api-data-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 วัน
+              },
+              // กำหนดให้ตอบกลับจากแคชแม้ Network Request ล้มเหลว
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          // การแคชรูปภาพจากภายนอก (Cache First)
+          {
+            urlPattern: /^https:\/\/images\.(unsplash|pexels)\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'external-images-cache',
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 วัน
+              },
+            },
+          },
+          // 4 แคช Google Fonts (ใช้ CacheFirst เพราะไม่ค่อยเปลี่ยน)
           {
             urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
             handler: 'CacheFirst',
@@ -35,22 +77,13 @@ export default defineConfig({
               expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 }, // 1 ปี
             },
           },
-          // แคช API ที่สำคัญ
-          // {
-          //   urlPattern: /^(?:https|http):\/\/api\.yourapp\.com\/api\/.*/i,
-          //   handler: 'StaleWhileRevalidate',
-          //   options: {
-          //     cacheName: 'api-data-cache',
-          //     expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 }, // 24 ชั่วโมง
-          //   },
-          // },
         ],
       },
 
       // 3. กำหนดไฟล์ Manifest (สำคัญสำหรับ PWA)
       manifest: {
-        name: 'My Awesome React App',
-        short_name: 'ReactPWA',
+        name: 'My Learn React App',
+        short_name: 'Learn React PWA',
         description: 'A sample React PWA with Vite',
         theme_color: '#ffffff',
         icons: [

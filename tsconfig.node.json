@@ -2,7 +2,7 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2023",
-    "lib": ["ES2023"],
+    "lib": ["ES2023", "webworker"], // "webworker" เป็นการรวมประเภทของ Global Scope เช่น self, caches, location
     "module": "ESNext",
     "types": ["node"],
     "skipLibCheck": true,
