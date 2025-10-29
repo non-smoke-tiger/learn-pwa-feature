@@ -1,24 +1,30 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useSnackbar } from 'notistack';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Switch from '@mui/material/Switch';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
 
 import LightModeRounded from '@mui/icons-material/LightModeRounded';
 import DarkModeRounded from '@mui/icons-material/DarkModeRounded';
 import SettingsRounded from '@mui/icons-material/SettingsRounded';
 import ContrastRounded from '@mui/icons-material/ContrastRounded';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import CloseRounded from '@mui/icons-material/CloseRounded';
+
 import { useAppTheme } from '../AppThemeContext';
 
 import reactLogo from '../assets/react.svg';
 import muiLogo from '../assets/mui.svg';
 import viteLogo from '../assets/vite.svg';
 import SubscribeNotiButton from './SubscribeNotiButton';
+import QRScanner, { type CustomScannerHandle } from './QRScanner';
 
 function TemplateContent() {
   // ดึง state และ helper functions จาก Context
@@ -27,8 +33,45 @@ function TemplateContent() {
 
   const { colorMode, textSize, contrastMode } = state;
 
-  // ------>
+  // --- count ทดสอบ HMR ---
   const [count, setCount] = useState(0);
+
+  // ---- QR CODE Scanner -----
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scanResult, setScanResult] = useState('');
+  const scannerRef = useRef<CustomScannerHandle>(null);
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  /** Handle ปิด scanner */
+  const handleCloseScanner = () => {
+    if (scannerRef.current) {
+      scannerRef.current.stop(); // สั่งหยุดกล้องผ่าน Ref
+    }
+    // Unmount Component
+    setIsScannerOpen(false);
+  };
+
+  /** Handle เมื่อ scan พบข้อมูล */
+  const handleDetected = (code: string) => {
+    setScanResult(code);
+    // ใช้ enqueueSnackbar เพื่อแสดง Notification
+    enqueueSnackbar(`Content detected`, {
+      variant: 'success',
+      autoHideDuration: 2000,
+    });
+    // Unmount Component
+    setIsScannerOpen(false);
+  };
+
+  /** Handle camera error */
+  const handleCameraError = (error: string) => {
+    // ใช้ enqueueSnackbar เพื่อแสดง Notification
+    enqueueSnackbar(`Global Camera Error : ${error}`, {
+      variant: 'error',
+      autoHideDuration: 3000,
+    });
+  };
 
   return (
     <Box>
@@ -210,8 +253,67 @@ function TemplateContent() {
           }
         />
       </Box>
+
+      {/* NOTIFICATION */}
       <Box sx={{ my: 2 }}>
         <SubscribeNotiButton />
+      </Box>
+
+      {/* SCAN QR CODE */}
+      <Box sx={{ my: 2 }}>
+        {scanResult && (
+          <Typography variant="h6" color="success.main">
+            สแกนสำเร็จ: {scanResult}
+          </Typography>
+        )}
+        {!isScannerOpen ? (
+          <Button
+            variant="contained"
+            onClick={() => {
+              setScanResult('');
+              setIsScannerOpen(true);
+            }}
+            sx={{ mt: 2 }}
+          >
+            สแกนข้อมูลจาก QR Code
+          </Button>
+        ) : (
+          <Paper
+            sx={{
+              border: 1,
+              borderColor: 'grey.300',
+              p: 2,
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                alignContent: 'justify',
+                width: '100%',
+                gap: 1,
+              }}
+            >
+              {/* Conditional Rendering เพื่อ Mount Component */}
+              <QRScanner
+                ref={scannerRef} // ส่ง Ref เข้าไป
+                onDetected={handleDetected}
+                onCameraError={handleCameraError}
+              />
+              {/* ปุ่มปิดที่จะถูกเรียกในกรณีที่ผู้ใช้ต้องการปิดโดยไม่สแกน */}
+              <Button
+                onClick={handleCloseScanner}
+                color="error"
+                variant="outlined"
+                title="ปิด Scanner"
+                size="small"
+              >
+                ยกเลิก
+              </Button>
+            </Box>
+          </Paper>
+        )}
       </Box>
     </Box>
   );

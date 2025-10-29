@@ -41,8 +41,8 @@ function App() {
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
           <NotificationManager />
+          <TemplateContent />
         </SnackbarProvider>
-        <TemplateContent />
       </LocalizationProvider>
     </AppThemeProvider>
   );
