@@ -9,14 +9,12 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Switch from '@mui/material/Switch';
-import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 
 import LightModeRounded from '@mui/icons-material/LightModeRounded';
 import DarkModeRounded from '@mui/icons-material/DarkModeRounded';
 import SettingsRounded from '@mui/icons-material/SettingsRounded';
 import ContrastRounded from '@mui/icons-material/ContrastRounded';
-import CloseRounded from '@mui/icons-material/CloseRounded';
 
 import { useAppTheme } from '../AppThemeContext';
 
