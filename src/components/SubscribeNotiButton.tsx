@@ -7,13 +7,51 @@ import CheckRounded from '@mui/icons-material/CheckRounded';
 import BlockRounded from '@mui/icons-material/BlockRounded';
 import NotificationsActiveRounded from '@mui/icons-material/NotificationsActiveRounded';
 
-// เป็นฟังก์ชันที่สร้าง Logic การสมัครสมาชิกจริง
-declare function subscribeUser(): void;
+// YOUR_VAPID_PUBLIC_KEY_HERE (เปลี่ยนเป็นคีย์ของตัวเอง)
+const VAPID_PUBLIC_KEY =
+  'BMw6oYLX-4ldFlLrSY_bzeKHQfPhJiRWa-wwPyPVRSHlLwZ5mWcTnEst6S3XtiHw7Z2Wd5mnyaIgWuLK39eUYqI';
 
+/** แปลง Base64 URL Safe string ให้เป็น Uint8Array */
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    // eslint-disable-next-line no-useless-escape
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+/** สำหรับสร้าง Logic การสมัครรับ Push */
+const subscribeUser = async () => {
+  const registration = await navigator.serviceWorker.ready;
+
+  // ตรวจสอบ Subscription เดิม
+  let subscription = await registration.pushManager.getSubscription();
+
+  const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+
+  subscription ??= await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey,
+  });
+
+  // ส่ง Subscription ไปยังเซิร์ฟเวอร์
+  // await sendSubscriptionToServer(subscription); // demo
+};
+
+/** status ที่กำหนดใหม่เพื่อตรวจสอบการรองรับ */
 type NotiStatus = NotificationPermission | 'unsupported' | '';
 
+/** ปุ่มสำหรับลงทะเบียนรับ Push Notification */
 function SubscribeNotiButton() {
-  // 💡 State สำหรับเก็บสถานะการอนุญาต
+  // State สำหรับเก็บสถานะการอนุญาต
   const [permissionStatus, setPermissionStatus] = useState<NotiStatus>('');
 
   // 1. ตรวจสอบสิทธิ์เมื่อ Component ถูก Mount
@@ -26,10 +64,10 @@ function SubscribeNotiButton() {
     }
   }, []);
 
-  // 2. ฟังก์ชันที่เรียกเมื่อผู้ใช้คลิก
+  /** เปิดรับการแจ้งเตือน */
   const handleSubscriptionClick = async () => {
     if ('Notification' in window) {
-      // 💡 การเรียก requestPermission ต้องอยู่ใน User Gesture
+      // เรียก requestPermission ด้วย User Gesture
       const result = await Notification.requestPermission();
 
       // อัปเดตสถานะทันทีหลังจากขอสิทธิ์
@@ -42,10 +80,10 @@ function SubscribeNotiButton() {
     }
   };
 
-  // 3. แสดงผลตามสถานะ
-  const renderButton = () => {
+  /** แสดง UI ตามสถานะ */
+  const renderUI = () => {
     if (permissionStatus === 'unsupported') {
-      // เบราว์เซอร์ไม่รองรับ Notification
+      // ไม่รองรับ Notification
       return (
         <Box
           sx={{
@@ -66,7 +104,7 @@ function SubscribeNotiButton() {
     }
 
     if (permissionStatus === 'granted') {
-      // 💡 สถานะ 'granted': ซ่อนปุ่ม
+      // สถานะ 'granted' ได้รับสิทธิ์ Notification แล้ว
       return (
         <Box
           sx={{
@@ -118,7 +156,7 @@ function SubscribeNotiButton() {
     );
   };
 
-  return <div>{renderButton()}</div>;
+  return renderUI();
 }
 
 export default SubscribeNotiButton;

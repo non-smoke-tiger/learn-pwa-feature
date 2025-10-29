@@ -293,18 +293,18 @@ function TemplateContent() {
                 gap: 1,
               }}
             >
-              {/* Conditional Rendering เพื่อ Mount Component */}
+              {/*  QRScanner Component */}
               <QRScanner
                 ref={scannerRef} // ส่ง Ref เข้าไป
                 onDetected={handleDetected}
                 onCameraError={handleCameraError}
               />
-              {/* ปุ่มปิดที่จะถูกเรียกในกรณีที่ผู้ใช้ต้องการปิดโดยไม่สแกน */}
+              {/* ปุ่มยกเลิกการแสกน */}
               <Button
                 onClick={handleCloseScanner}
                 color="error"
                 variant="outlined"
-                title="ปิด Scanner"
+                title="ยกเลิกการแสกน"
                 size="small"
               >
                 ยกเลิก
