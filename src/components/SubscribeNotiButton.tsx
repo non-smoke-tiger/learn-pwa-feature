@@ -7,40 +7,62 @@ import CheckRounded from '@mui/icons-material/CheckRounded';
 import BlockRounded from '@mui/icons-material/BlockRounded';
 import NotificationsActiveRounded from '@mui/icons-material/NotificationsActiveRounded';
 
-// สมมติว่า subscribeUser เป็นฟังก์ชันที่คุณสร้างไว้
+// เป็นฟังก์ชันที่สร้าง Logic การสมัครสมาชิกจริง
 declare function subscribeUser(): void;
+
+type NotiStatus = NotificationPermission | 'unsupported' | '';
 
 function SubscribeNotiButton() {
   // 💡 State สำหรับเก็บสถานะการอนุญาต
-  const [permissionStatus, setPermissionStatus] = useState(
-    Notification.permission
-  );
+  const [permissionStatus, setPermissionStatus] = useState<NotiStatus>('');
 
   // 1. ตรวจสอบสิทธิ์เมื่อ Component ถูก Mount
   useEffect(() => {
-    // กำหนดสถานะเริ่มต้นจาก API
-    setPermissionStatus(Notification.permission);
+    if ('Notification' in window) {
+      setPermissionStatus(Notification.permission);
+    } else {
+      // แจ้งสถานะเบราว์เซอร์ที่ไม่รองรับ
+      setPermissionStatus('unsupported');
+    }
   }, []);
 
   // 2. ฟังก์ชันที่เรียกเมื่อผู้ใช้คลิก
   const handleSubscriptionClick = async () => {
-    // 💡 การเรียก requestPermission ต้องอยู่ใน User Gesture
-    const result = await Notification.requestPermission();
+    if ('Notification' in window) {
+      // 💡 การเรียก requestPermission ต้องอยู่ใน User Gesture
+      const result = await Notification.requestPermission();
 
-    // อัปเดตสถานะทันทีหลังจากขอสิทธิ์
-    setPermissionStatus(result);
+      // อัปเดตสถานะทันทีหลังจากขอสิทธิ์
+      setPermissionStatus(result);
 
-    // ถ้าอนุญาตแล้ว ค่อยดำเนินการ Subscribe
-    if (result === 'granted') {
-      subscribeUser();
+      // ถ้าอนุญาตแล้ว ค่อยดำเนินการ Subscribe
+      if (result === 'granted') {
+        subscribeUser();
+      }
     }
   };
 
   // 3. แสดงผลตามสถานะ
   const renderButton = () => {
-    if (!('Notification' in window)) {
+    if (permissionStatus === 'unsupported') {
       // เบราว์เซอร์ไม่รองรับ Notification
-      return <p>เบราว์เซอร์ไม่รองรับการแจ้งเตือน</p>;
+      return (
+        <Box
+          sx={{
+            p: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'error.main',
+            gap: 1,
+          }}
+        >
+          <BlockRounded fontSize="small" />
+          <Typography variant="body1">
+            เบราว์เซอร์ไม่รองรับการแจ้งเตือน{' '}
+          </Typography>
+        </Box>
+      );
     }
 
     if (permissionStatus === 'granted') {
