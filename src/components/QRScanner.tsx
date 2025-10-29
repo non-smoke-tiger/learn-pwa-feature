@@ -79,6 +79,11 @@ const QRScanner = forwardRef<CustomScannerHandle, ScannerProps>(
           // }
         );
         setIsScanning(true);
+        setTimeout(() => {
+          scanner.applyVideoConstraints({
+            focusMode: 'continuous',
+          } as MediaTrackConstraints);
+        }, 2000);
       } catch (err) {
         let errMsg: string;
         // ตรวจสอบว่า 'err' เป็น Error Object มาตรฐานหรือไม่
