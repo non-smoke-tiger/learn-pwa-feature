@@ -8,7 +8,7 @@ import { precacheAndRoute } from 'workbox-precaching';
 // Workbox จะแทรกรายการไฟล์ที่ถูก Precache ที่บรรทัดนี้
 precacheAndRoute(self.__WB_MANIFEST || []);
 
-// ** โค้ดสำหรับ Push Notification **
+// ** โค้ดสำหรับ รับ Push Notification **
 self.addEventListener('push', (event) => {
   const data = event.data.json();
 

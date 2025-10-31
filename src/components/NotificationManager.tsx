@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 interface PushPayload {
   title: string;
   body: string;
-  url?: string;
+  data?: { url?: string };
 }
 
 // ฟังก์ชันสำหรับนำทาง
@@ -20,14 +20,14 @@ const handleNavigate = (key: string | number, url?: string) => {
 const createPushAlertContent = (payload: PushPayload) =>
   function contentsOut(key: string | number) {
     // ถ้าไม่มี URL ก็ไม่ต้องแสดงปุ่ม
-    if (!payload.url) return null;
+    if (!payload.data?.url) return null;
 
     return (
       <Button
         key="action-button" // ควรมี key เพื่อความเสถียร
         onClick={(e) => {
           e.stopPropagation(); // ป้องกันการปิดเมื่อคลิกปุ่ม
-          handleNavigate(key, payload.url);
+          handleNavigate(key, payload.data?.url);
         }}
         style={{
           color: 'white',
@@ -42,6 +42,7 @@ const createPushAlertContent = (payload: PushPayload) =>
     );
   };
 
+/** Component สำหรับจัดการ Notification แบบไม่ได้ใช้ FCM */
 function NotificationManager() {
   const { enqueueSnackbar } = useSnackbar();
 
